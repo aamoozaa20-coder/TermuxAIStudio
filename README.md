@@ -1,58 +1,53 @@
 # Termux AI Studio
 
-اپلیکیشن اندرویدی حرفه‌ای که ترمینال، چت هوش مصنوعی، ویرایشگر کد و مدیریت فایل را در یک برنامه جمع می‌کند.
+اپلیکیشن اندرویدی برای کدنویسی، چت با هوش مصنوعی، ترمینال و مدیریت فایل.
 
-## ویژگی‌های نسخه فعلی (v1.0.0)
+## قابلیت‌های نسخه ۱.۱
 
-- ناوبری ۴ بخشی با Bottom Navigation
-- ترمینال ساده (sandbox)
-- صفحه چت AI (فعلاً آفلاین)
-- ویرایشگر کد ساده
-- مدیریت فایل (نمونه)
-- تم تاریک و روشن
-- پشتیبانی از زبان فارسی (RTL)
+### چت هوش مصنوعی
+- انتخاب مدل از داخل چت (OpenCode Free، DeepSeek Free، Gemini، ...)
+- مدل‌های رایگان بدون نیاز به کلید
+- پاسخ هوشمند به درخواست‌های کدنویسی، اینفوگرافیک و نصب ابزار
+- آماده‌سازی برای اتصال واقعی API
 
-## ساختار پروژه
+### ترمینال
+- اجرای برخی دستورات لینوکس (تا حد مجاز sandbox اندروید)
+- دستور `ai-install` برای راهنمای نصب ابزارهای AI در Termux
+- دستورات: help, date, uname, ls, pwd, whoami, id, echo و ...
 
-```
-app/
-├── src/main/java/com/termuxaistudio/app/
-│   ├── MainActivity.kt
-│   └── ui/
-│       ├── screens/
-│       │   ├── TerminalScreen.kt
-│       │   ├── ChatScreen.kt
-│       │   ├── EditorScreen.kt
-│       │   └── FilesScreen.kt
-│       └── theme/
-│           ├── Theme.kt
-│           └── Type.kt
-```
+### ویرایشگر کد
+- ویرایشگر متن با فونت monospace
+- آماده برای اتصال به sora-editor در نسخه‌های بعدی
 
-## ساخت و اجرا
+### مدیریت فایل
+- نمایش ساختار پوشه‌ها (نسخه نمایشی)
 
-### پیش‌نیاز
-- Android Studio Ladybug یا جدیدتر
-- JDK 17
-- Android SDK 35
+### تنظیمات
+- محل وارد کردن API Key برای Gemini و DeepSeek
+- راهنمای نصب OpenCode داخل Termux
 
-### ساخت APK
+## ساخت APK
 
-```bash
-./gradlew assembleDebug
-```
+۱. پروژه را در Android Studio باز کنید  
+۲. `Build → Build APK(s)` را بزنید  
+۳. فایل از مسیر زیر قابل دریافت است:
 
-فایل APK در مسیر زیر ساخته می‌شود:
 `app/build/outputs/apk/debug/app-debug.apk`
 
-## مراحل بعدی
+## استفاده همراه با Termux (قدرت کامل)
 
-1. اتصال واقعی به ترمینال (ProcessBuilder + PTY)
-2. اتصال به OpenCode / DeepSeek / Gemini
-3. ویرایشگر پیشرفته (sora-editor)
-4. مدیریت فایل واقعی با SAF
-5. ساخت اینفوگرافیک و تولید تصویر
+```bash
+pkg update && pkg upgrade
+pkg install nodejs-lts
+npm install -g opencode-ai
+opencode
+```
+
+سپس مدل رایگان را داخل OpenCode انتخاب کنید.
+
+## لینک پروژه
+
+https://github.com/aamoozaa20-coder/TermuxAIStudio
 
 ## لایسنس
-
 MIT

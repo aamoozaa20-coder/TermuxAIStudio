@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.*
@@ -42,9 +43,10 @@ sealed class Screen(val route: String, val titleRes: Int, val icon: ImageVector)
     object Chat : Screen("chat", R.string.tab_chat, Icons.Default.SmartToy)
     object Editor : Screen("editor", R.string.tab_editor, Icons.Default.Code)
     object Files : Screen("files", R.string.tab_files, Icons.Default.Folder)
+    object Settings : Screen("settings", R.string.tab_settings, Icons.Default.Settings)
 }
 
-val screens = listOf(
+val bottomScreens = listOf(
     Screen.Terminal,
     Screen.Chat,
     Screen.Editor,
@@ -55,42 +57,65 @@ val screens = listOf(
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val showBottomBar = currentRoute != Screen.Settings.route
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-
-                screens.forEach { screen ->
-                    NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = null) },
-                        label = { Text(stringResource(screen.titleRes)) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+        topBar = {
+            if (showBottomBar) {
+                TopAppBar(
+                    title = { Text("Termux AI Studio") },
+                    actions = {
+                        IconButton(onClick = {
+                            navController.navigate(Screen.Settings.route)
+                        }) {
+                            Icon(Icons.Default.Settings, contentDescription = "تنظیمات")
                         }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
                     )
+                )
+            }
+        },
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar {
+                    val currentDestination = navBackStackEntry?.destination
+                    bottomScreens.forEach { screen ->
+                        NavigationBarItem(
+                            icon = { Icon(screen.icon, contentDescription = null) },
+                            label = { Text(stringResource(screen.titleRes)) },
+                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                            onClick = {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Terminal.route,
+            startDestination = Screen.Chat.route,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Terminal.route) { TerminalScreen() }
             composable(Screen.Chat.route) { ChatScreen() }
             composable(Screen.Editor.route) { EditorScreen() }
             composable(Screen.Files.route) { FilesScreen() }
+            composable(Screen.Settings.route) {
+                SettingsScreen(onBack = { navController.popBackStack() })
+            }
         }
     }
 }
