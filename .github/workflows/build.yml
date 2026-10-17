@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: Build Debug APK
     runs-on: ubuntu-latest
 
     steps:
@@ -20,27 +21,37 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew || true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Create local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+      - name: Generate Gradle Wrapper
+        run: |
+          gradle wrapper --gradle-version 8.9
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
       - name: Build Debug APK
-        run: |
-          if [ -f gradlew ]; then
-            ./gradlew assembleDebug --stacktrace
-          else
-            echo "Gradle wrapper not found. Creating temporary build..."
-            # Fallback for first builds without wrapper
-            exit 0
-          fi
+        run: ./gradlew assembleDebug --stacktrace --no-daemon
 
       - name: Upload APK
-        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
+          name: TermuxAIStudio-debug
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 14
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: List APK
+        run: |
+          echo "=== APK built successfully ==="
+          ls -lh app/build/outputs/apk/debug/
